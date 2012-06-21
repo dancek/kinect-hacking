@@ -10,7 +10,7 @@
  * this demos is at the moment only for 1 user, will be implemented later
  * ----------------------------------------------------------------------------
  */
- 
+import processing.opengl.*;
 import SimpleOpenNI.*;
 
 SimpleOpenNI context;
@@ -28,7 +28,7 @@ Cylinder cyl;
 
 void setup()
 {
-  size(1600,1080,P3D);  // strange, get drawing error in the cameraFrustum if i use P3D, in opengl there is no problem
+  size(1600,1080,OPENGL);  // strange, get drawing error in the cameraFrustum if i use P3D, in opengl there is no problem
   context = new SimpleOpenNI(this);
    
   // disable mirror
