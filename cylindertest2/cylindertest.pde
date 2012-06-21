@@ -32,6 +32,8 @@ void draw() {
   shininess(0);
   emissive(0.5);
   
+  c.drawBetween(new PVector(0,-1,0), new PVector(0,0,3));
+
   c.draw();
   
   translate(1,0,0);
