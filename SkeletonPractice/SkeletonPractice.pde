@@ -12,8 +12,6 @@
  */
  
 import SimpleOpenNI.*;
-import shapes3d.*;
-
 
 SimpleOpenNI context;
 float        zoomF =0.5f;
@@ -25,7 +23,7 @@ boolean      autoCalib=true;
 PVector      bodyCenter = new PVector();
 PVector      bodyDir = new PVector();
 
-Tube tube;
+Cylinder cyl;
 
 
 void setup()
@@ -53,7 +51,7 @@ void setup()
               float(width)/float(height),
               10,150000);
               
-  tube = new Tube(this, 1, 6);
+  cyl = new Cylinder(20, 20);
  }
 
 void draw()
@@ -155,9 +153,7 @@ void drawLimb(int userId,int jointType1,int jointType2)
   confidence = context.getJointPositionSkeleton(userId,jointType2,jointPos2);
 
   stroke(255,0,0,confidence * 200 + 55);
-  drawCylinder(jointPos1.x,jointPos1.y,jointPos1.z,
-               jointPos2.x,jointPos2.y,jointPos2.z,
-               100);
+  drawCylinder(jointPos1, jointPos2, 100);
   
   drawJointOrientation(userId,jointType1,jointPos1,50);
 }
@@ -196,11 +192,9 @@ void drawJointOrientation(int userId,int jointType,PVector pos,float length)
 /**
  * Draw a cylinder from point a to point b with radius r.
  */
-void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, float r)
+void drawCylinder(PVector p, PVector q, float r)
 {
-  tube.setSize(10,10,10,10);
-  tube.setWorldPos(ax,ay,az, bx,by,bz);
-  tube.draw();
+  cyl.drawBetween(p,q);
 }
 
 // -----------------------------------------------------------------
