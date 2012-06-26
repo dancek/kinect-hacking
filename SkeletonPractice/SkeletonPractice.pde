@@ -23,6 +23,8 @@ boolean      autoCalib=true;
 PVector      bodyCenter = new PVector();
 PVector      bodyDir = new PVector();
 
+color[]      userColors = { color(255,0,0), color(0,255,0), color(0,0,255), color(255,255,0), color(255,0,255), color(0,255,255) };
+
 Cylinder cyl;
 
 
@@ -68,9 +70,16 @@ void draw()
   scale(zoomF);
   
   int[]   depthMap = context.depthMap();
-  int     steps   = 5;  // to speed up the drawing, draw every nth point
+  int     steps   = 3;  // to speed up the drawing, draw every nth point
   int     index;
   PVector realWorldPoint;
+
+  int userCount = context.getNumberOfUsers();
+  int[] userMap = null;
+  if(userCount > 0)
+  {
+    userMap = context.getUsersPixels(SimpleOpenNI.USERS_ALL);
+  }
  
   translate(0,0,-1000);  // set the rotation center of the scene 1000 infront of the camera
 
@@ -82,6 +91,16 @@ void draw()
       index = x + y * context.depthWidth();
       if(depthMap[index] > 0)
       { 
+        // check if there is a user
+        if(userMap != null && userMap[index] != 0)
+        {  // calc the user color
+          int colorIndex = userMap[index] % userColors.length;
+          stroke(userColors[colorIndex]); 
+        }
+        else
+          // default color
+          stroke(100); 
+
         // draw the projected point
         realWorldPoint = context.depthMapRealWorld()[index];
         point(realWorldPoint.x,realWorldPoint.y,realWorldPoint.z);
@@ -104,6 +123,8 @@ void draw()
 // draw the skeleton with the selected joints
 void drawSkeleton(int userId)
 {
+  lights();
+  
   strokeWeight(3);
 
   // to get the 3d joint data
@@ -152,7 +173,8 @@ void drawLimb(int userId,int jointType1,int jointType2)
   confidence = context.getJointPositionSkeleton(userId,jointType1,jointPos1);
   confidence = context.getJointPositionSkeleton(userId,jointType2,jointPos2);
 
-  stroke(255,0,0,confidence * 200 + 55);
+  noStroke();
+  fill(255,255,255,confidence * 200 + 55);
   drawCylinder(jointPos1, jointPos2, 100);
   
   drawJointOrientation(userId,jointType1,jointPos1,50);
