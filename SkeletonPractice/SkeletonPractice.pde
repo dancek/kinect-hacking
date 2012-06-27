@@ -38,10 +38,10 @@ void setup()
   // disable mirror
   context.setMirror(false);
 
-  // enable depthMap generation 
-  if(context.enableDepth() == false)
+  // enable depthMap and RGB image generation 
+  if(context.enableDepth() == false || context.enableRGB() == false)
   {
-     println("Can't open the depthMap, maybe the camera is not connected!"); 
+     println("Can't open the depthMap or RGB image, maybe the camera is not connected!"); 
      exit();
      return;
   }
@@ -83,9 +83,12 @@ void draw()
   scale(zoomF);
   
   int[]   depthMap = context.depthMap();
-  int     steps   = 3;  // to speed up the drawing, draw every nth point
+  int     steps    = 3;  // to speed up the drawing, draw every nth point
   int     index;
   PVector realWorldPoint;
+
+  PImage  rgbImage = context.rgbImage();
+  rgbImage.loadPixels();
 
   int userCount = context.getNumberOfUsers();
   int[] userMap = null;
@@ -134,7 +137,7 @@ void draw()
               }
             }
             // assign the point to the bone
-            closestBone.addPoint(realWorldPoint, closestDistance);
+            closestBone.addPoint(realWorldPoint, closestDistance, rgbImage.pixels[index]);
             // choose color
             stroke((Integer) boneColors.get(colorIndex));
           } else {
@@ -157,7 +160,9 @@ void draw()
   for(int i=0;i<userList.length;i++)
   {
     if(context.isTrackingSkeleton(userList[i]))
+    {
       drawSkeleton(userList[i]);
+    }
   }    
  
   // draw the kinect cam
