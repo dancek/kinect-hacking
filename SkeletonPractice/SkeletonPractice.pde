@@ -98,7 +98,6 @@ void draw()
         for (int i=0; i < bones.size(); ++i) {
           bone = (Bone) bones.get(i);
           bone.updatePosition(context);
-          println(bone.jointAPos);
         }
       }
     }
