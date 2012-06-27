@@ -25,8 +25,9 @@ PVector      bodyDir = new PVector();
 
 color[]      userColors = { color(255,0,0), color(0,255,0), color(0,0,255), color(255,255,0), color(255,0,255), color(0,255,255) };
 
-Cylinder cyl;
+ArrayList bones;
 
+Cylinder cyl;
 
 void setup()
 {
@@ -54,7 +55,10 @@ void setup()
               10,150000);
               
   cyl = new Cylinder(20, 20);
- }
+
+  bones = new ArrayList();
+  createBones(0);  
+}
 
 void draw()
 {
@@ -160,7 +164,6 @@ void drawSkeleton(int userId)
        bodyDir.x ,bodyDir.y,bodyDir.z);
 
   strokeWeight(1);
- 
 }
 
 void drawLimb(int userId,int jointType1,int jointType2)
@@ -355,4 +358,28 @@ void getBodyDirection(int userId,PVector centerPoint,PVector dir)
   
   dir.set(up.cross(left));
   dir.normalize();
+}
+
+void createBones(int userId)
+{
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_HEAD, SimpleOpenNI.SKEL_NECK));
+
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_NECK, SimpleOpenNI.SKEL_LEFT_SHOULDER));
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, SimpleOpenNI.SKEL_LEFT_ELBOW));
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_LEFT_ELBOW, SimpleOpenNI.SKEL_LEFT_HAND));
+
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_NECK, SimpleOpenNI.SKEL_RIGHT_SHOULDER));
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, SimpleOpenNI.SKEL_RIGHT_ELBOW));
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_RIGHT_ELBOW, SimpleOpenNI.SKEL_RIGHT_HAND));
+
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, SimpleOpenNI.SKEL_TORSO));
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, SimpleOpenNI.SKEL_TORSO));
+
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_TORSO, SimpleOpenNI.SKEL_LEFT_HIP));
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_LEFT_HIP, SimpleOpenNI.SKEL_LEFT_KNEE));
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_LEFT_KNEE, SimpleOpenNI.SKEL_LEFT_FOOT));
+
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_TORSO, SimpleOpenNI.SKEL_RIGHT_HIP));
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_RIGHT_HIP, SimpleOpenNI.SKEL_RIGHT_KNEE));
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, SimpleOpenNI.SKEL_RIGHT_FOOT)); 
 }
