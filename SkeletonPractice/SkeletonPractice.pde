@@ -26,6 +26,7 @@ PVector      bodyDir = new PVector();
 color[]      userColors = { color(255,0,0), color(0,255,0), color(0,0,255), color(255,255,0), color(255,0,255), color(0,255,255) };
 
 ArrayList bones;
+ArrayList boneColors;
 
 Cylinder cyl;
 
@@ -57,7 +58,15 @@ void setup()
   cyl = new Cylinder(20, 20);
 
   bones = new ArrayList();
-  createBones(0);  
+  createBones(1);
+  
+  colorMode(HSB, bones.size(), 255, 255);
+  boneColors = new ArrayList();
+  for (int i=0; i < bones.size(); ++i) {
+    boneColors.add(color(i, 255, 255));
+    println(boneColors.get(i));
+  }
+  colorMode(RGB, 255);
 }
 
 void draw()
@@ -83,6 +92,16 @@ void draw()
   if(userCount > 0)
   {
     userMap = context.getUsersPixels(SimpleOpenNI.USERS_ALL);
+    for (int u=1; u<=userCount; ++u) {
+      if (context.isTrackingSkeleton(u)) {
+        Bone bone;
+        for (int i=0; i < bones.size(); ++i) {
+          bone = (Bone) bones.get(i);
+          bone.updatePosition(context);
+          println(bone.jointAPos);
+        }
+      }
+    }
   }
  
   translate(0,0,-1000);  // set the rotation center of the scene 1000 infront of the camera
@@ -95,18 +114,37 @@ void draw()
       index = x + y * context.depthWidth();
       if(depthMap[index] > 0)
       { 
+        realWorldPoint = context.depthMapRealWorld()[index];
+
         // check if there is a user
         if(userMap != null && userMap[index] != 0)
-        {  // calc the user color
-          int colorIndex = userMap[index] % userColors.length;
-          stroke(userColors[colorIndex]); 
+        {
+          if (context.isTrackingSkeleton(userMap[index])) {
+            // find the closest bone
+            int colorIndex = 0;
+            float closestDistance = Float.MAX_VALUE, distance;
+            Bone bone;
+            for (int i=0; i < bones.size(); ++i) {
+              bone = (Bone) bones.get(i);
+              // check distance
+              distance = bone.distanceToPoint(realWorldPoint);
+              if (distance < closestDistance) {
+                colorIndex = i;
+                closestDistance = distance;
+              }
+            }
+            // choose color
+            stroke((Integer) boneColors.get(colorIndex));
+          } else {
+            int colorIndex = userMap[index] % userColors.length;
+            stroke(userColors[colorIndex]); 
+          }
         }
         else
           // default color
           stroke(100); 
 
         // draw the projected point
-        realWorldPoint = context.depthMapRealWorld()[index];
         point(realWorldPoint.x,realWorldPoint.y,realWorldPoint.z);
       }
     } 
