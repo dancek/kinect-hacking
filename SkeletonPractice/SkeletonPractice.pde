@@ -166,60 +166,14 @@ void drawSkeleton(int userId)
 {
   lights();
   
-  strokeWeight(3);
-
-  // to get the 3d joint data
-  drawLimb(userId, SimpleOpenNI.SKEL_HEAD, SimpleOpenNI.SKEL_NECK);
-
-  drawLimb(userId, SimpleOpenNI.SKEL_NECK, SimpleOpenNI.SKEL_LEFT_SHOULDER);
-  drawLimb(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, SimpleOpenNI.SKEL_LEFT_ELBOW);
-  drawLimb(userId, SimpleOpenNI.SKEL_LEFT_ELBOW, SimpleOpenNI.SKEL_LEFT_HAND);
-
-  drawLimb(userId, SimpleOpenNI.SKEL_NECK, SimpleOpenNI.SKEL_RIGHT_SHOULDER);
-  drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, SimpleOpenNI.SKEL_RIGHT_ELBOW);
-  drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_ELBOW, SimpleOpenNI.SKEL_RIGHT_HAND);
-
-  drawLimb(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, SimpleOpenNI.SKEL_TORSO);
-  drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, SimpleOpenNI.SKEL_TORSO);
-
-  drawLimb(userId, SimpleOpenNI.SKEL_TORSO, SimpleOpenNI.SKEL_LEFT_HIP);
-  drawLimb(userId, SimpleOpenNI.SKEL_LEFT_HIP, SimpleOpenNI.SKEL_LEFT_KNEE);
-  drawLimb(userId, SimpleOpenNI.SKEL_LEFT_KNEE, SimpleOpenNI.SKEL_LEFT_FOOT);
-
-  drawLimb(userId, SimpleOpenNI.SKEL_TORSO, SimpleOpenNI.SKEL_RIGHT_HIP);
-  drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_HIP, SimpleOpenNI.SKEL_RIGHT_KNEE);
-  drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, SimpleOpenNI.SKEL_RIGHT_FOOT);  
-
-  // draw body direction
-  getBodyDirection(userId,bodyCenter,bodyDir);
-  
-  bodyDir.mult(200);  // 200mm length
-  bodyDir.add(bodyCenter);
-  
-  stroke(255,200,200);
-  line(bodyCenter.x,bodyCenter.y,bodyCenter.z,
-       bodyDir.x ,bodyDir.y,bodyDir.z);
-
-  strokeWeight(1);
+  Bone bone;
+  for (int i=0; i<bones.size(); ++i) {
+    bone = (Bone) bones.get(i);
+    bone.draw();
+  }
 }
 
-void drawLimb(int userId,int jointType1,int jointType2)
-{
-  PVector jointPos1 = new PVector();
-  PVector jointPos2 = new PVector();
-  float  confidence;
-  
-  // draw the joint position
-  confidence = context.getJointPositionSkeleton(userId,jointType1,jointPos1);
-  confidence = context.getJointPositionSkeleton(userId,jointType2,jointPos2);
-
-  noStroke();
-  fill(255,255,255,confidence * 200 + 55);
-  drawCylinder(jointPos1, jointPos2, 100);
-  
-  drawJointOrientation(userId,jointType1,jointPos1,50);
-}
-
+// TODO: use this
 void drawJointOrientation(int userId,int jointType,PVector pos,float length)
 {
   // draw the joint orientation  
@@ -249,14 +203,6 @@ void drawJointOrientation(int userId,int jointType,PVector pos,float length)
     line(0,0,0,
          0,0,length);
   popMatrix();
-}
-
-/**
- * Draw a cylinder from point a to point b with radius r.
- */
-void drawCylinder(PVector p, PVector q, float r)
-{
-  cyl.drawBetween(p,q);
 }
 
 // -----------------------------------------------------------------
@@ -366,6 +312,7 @@ void keyPressed()
   }
 }
 
+// TODO: use this
 void getBodyDirection(int userId,PVector centerPoint,PVector dir)
 {
   PVector jointL = new PVector();

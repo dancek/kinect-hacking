@@ -4,6 +4,8 @@ class Bone
   PVector jointAPos, jointBPos;
   int user;
   
+  Cylinder cyl;
+  
   PVector ab;    // vector between endpoints
   float length2; // length of ab, squared
   
@@ -14,6 +16,11 @@ class Bone
     this.jointBType = b;
     this.jointAPos = new PVector();
     this.jointBPos = new PVector();
+    this.cyl = new Cylinder();
+  }
+  
+  void draw() {
+    this.cyl.drawBetween(this.jointAPos, this.jointBPos);
   }
   
   void updatePosition(SimpleOpenNI context)

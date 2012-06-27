@@ -14,6 +14,11 @@ class Cylinder {
     this.faces = faces;
   }
   
+  void setRadius(float r)
+  {
+    this.radius = r;
+  }
+  
   void drawBetween(PVector p, PVector q)
   {
     PVector pq = PVector.sub(q,p);
