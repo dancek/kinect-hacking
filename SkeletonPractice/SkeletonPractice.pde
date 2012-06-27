@@ -122,7 +122,7 @@ void draw()
             // find the closest bone
             int colorIndex = 0;
             float closestDistance = Float.MAX_VALUE, distance;
-            Bone bone;
+            Bone bone, closestBone = null;
             for (int i=0; i < bones.size(); ++i) {
               bone = (Bone) bones.get(i);
               // check distance
@@ -130,8 +130,11 @@ void draw()
               if (distance < closestDistance) {
                 colorIndex = i;
                 closestDistance = distance;
+                closestBone = bone;
               }
             }
+            // assign the point to the bone
+            closestBone.addPoint(realWorldPoint, closestDistance);
             // choose color
             stroke((Integer) boneColors.get(colorIndex));
           } else {

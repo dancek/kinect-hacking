@@ -2,7 +2,10 @@ class Bone
 {
   int jointAType, jointBType;
   PVector jointAPos, jointBPos;
+  float radius;
   int user;
+  
+  ArrayList points;
   
   Cylinder cyl;
   
@@ -17,9 +20,17 @@ class Bone
     this.jointAPos = new PVector();
     this.jointBPos = new PVector();
     this.cyl = new Cylinder();
+    this.points = new ArrayList();
+    this.radius = 10;
   }
   
   void draw() {
+    float r = 0;
+    for (int i=0; i<this.points.size(); ++i) {
+      r += (Float) this.points.get(i) / this.points.size();
+    }
+    this.radius = r;
+    this.cyl.setRadius(this.radius);
     this.cyl.drawBetween(this.jointAPos, this.jointBPos);
   }
   
@@ -29,6 +40,7 @@ class Bone
     float confidenceB = context.getJointPositionSkeleton(this.user, this.jointBType, this.jointBPos);
     this.ab = PVector.sub(this.jointBPos, this.jointAPos);
     this.length2 = PVector.dot(ab, ab);
+    this.points.clear();
   }
   
   float distanceToPoint(PVector p)
@@ -50,6 +62,11 @@ class Bone
     
     PVector projection = PVector.add(v, PVector.mult(ab, t));
     return PVector.dist(p, projection);
+  }
+  
+  void addPoint(PVector p, float distance)
+  {
+    this.points.add(distance);
   }
 }
 
