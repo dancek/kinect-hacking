@@ -12,8 +12,11 @@
  */
 import processing.opengl.*;
 import SimpleOpenNI.*;
+import peasy.*;
 
+PeasyCam cam;
 SimpleOpenNI context;
+
 float        zoomF =0.5f;
 float        rotX = radians(180);  // by default rotate the hole scene 180deg around the x-axis, 
                                    // the data from openni comes upside down
@@ -34,6 +37,7 @@ Cylinder cyl;
 void setup()
 {
   size(1600,1080,OPENGL);  // strange, get drawing error in the cameraFrustum if i use P3D, in opengl there is no problem
+  cam = new PeasyCam(this, 0,0,-1000, 1500);
   context = new SimpleOpenNI(this);
    
   // disable mirror
@@ -79,7 +83,7 @@ void draw()
   background(0,0,0);
   
   // set the scene pos
-  translate(width/2, height/2, 0);
+  //translate(width/2, height/2, 0);
   rotateX(rotX);
   rotateY(rotY);
   scale(zoomF);
@@ -108,8 +112,6 @@ void draw()
     }
   }
  
-  translate(0,0,-1000);  // set the rotation center of the scene 1000 infront of the camera
-
   stroke(100); 
   for(int y=0;y < context.depthHeight();y+=steps)
   {
@@ -148,8 +150,7 @@ void draw()
           }
         }
         else
-          // default color
-          stroke(100); 
+          stroke(rgbImage.pixels[index]); 
 
         if (drawCloud) {
           // draw the projected point
@@ -369,8 +370,7 @@ void createBones(int userId)
   bones.add(new Bone(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, SimpleOpenNI.SKEL_RIGHT_ELBOW));
   bones.add(new Bone(userId, SimpleOpenNI.SKEL_RIGHT_ELBOW, SimpleOpenNI.SKEL_RIGHT_HAND));
 
-  bones.add(new Bone(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, SimpleOpenNI.SKEL_TORSO));
-  bones.add(new Bone(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, SimpleOpenNI.SKEL_TORSO));
+  bones.add(new Bone(userId, SimpleOpenNI.SKEL_NECK, SimpleOpenNI.SKEL_TORSO));
 
   bones.add(new Bone(userId, SimpleOpenNI.SKEL_TORSO, SimpleOpenNI.SKEL_LEFT_HIP));
   bones.add(new Bone(userId, SimpleOpenNI.SKEL_LEFT_HIP, SimpleOpenNI.SKEL_LEFT_KNEE));
