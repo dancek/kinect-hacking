@@ -19,6 +19,7 @@ float        rotX = radians(180);  // by default rotate the hole scene 180deg ar
                                    // the data from openni comes upside down
 float        rotY = radians(0);
 boolean      autoCalib=true;
+boolean      drawCloud=true;
 
 PVector      bodyCenter = new PVector();
 PVector      bodyDir = new PVector();
@@ -39,12 +40,14 @@ void setup()
   context.setMirror(false);
 
   // enable depthMap and RGB image generation 
-  if(context.enableDepth() == false || context.enableRGB() == false)
+  if(!context.enableDepth() || !context.enableRGB() || !context.alternativeViewPointDepthToImage())
   {
-     println("Can't open the depthMap or RGB image, maybe the camera is not connected!"); 
+     println("Something went wrong, maybe the camera is not connected!"); 
      exit();
      return;
   }
+  
+  println("Depth image size: " + context.depthWidth() + "x" + context.depthHeight());
 
   // enable skeleton generation for all joints
   context.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
@@ -64,7 +67,6 @@ void setup()
   boneColors = new ArrayList();
   for (int i=0; i < bones.size(); ++i) {
     boneColors.add(color(i, 255, 255));
-    println(boneColors.get(i));
   }
   colorMode(RGB, 255);
 }
@@ -149,8 +151,10 @@ void draw()
           // default color
           stroke(100); 
 
-        // draw the projected point
-        point(realWorldPoint.x,realWorldPoint.y,realWorldPoint.z);
+        if (drawCloud) {
+          // draw the projected point
+          point(realWorldPoint.x,realWorldPoint.y,realWorldPoint.z);
+        }
       }
     } 
   } 
@@ -288,7 +292,8 @@ void keyPressed()
   switch(key)
   {
   case ' ':
-    context.setMirror(!context.mirror());
+    // toggle drawing point cloud
+    drawCloud = !drawCloud;
     break;
   }
     

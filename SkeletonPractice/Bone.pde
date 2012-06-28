@@ -28,31 +28,30 @@ class Bone
   
   void draw() {
     // calculate average radius
-    float r = 0;
+    float radius_ = 0;
     for (int i=0; i<this.points.size(); ++i) {
-      r += (Float) this.points.get(i);
+      radius_ += (Float) this.points.get(i);
     }
-    this.radius = r / this.points.size();
+    this.radius = radius_ / this.points.size();
     
     // calculate average color
     if (this.pointColors.size() > 0) {
-      colorMode(HSB, 1.0);
+      colorMode(RGB, 255);
       int sz = this.pointColors.size();
-      float h=0, s=0, b=0;
+      float r=0, g=0, b=0;
       color c;
       for (int i=0; i<sz; ++i) {
         c = (Integer) this.pointColors.get(i);
-        h += hue(c);
-        s += saturation(c);
-        b += brightness(c);
+        r += red(c);
+        g += green(c);
+        b += blue(c);
       }
-      fill(color(h/sz, s/sz, b/sz));
+      fill(color(r/sz, g/sz, b/sz));
     }
     
+    noStroke();
     this.cyl.setRadius(this.radius);
     this.cyl.drawBetween(this.jointAPos, this.jointBPos);
-
-    colorMode(RGB, 255);
   }
   
   void updatePosition(SimpleOpenNI context)
