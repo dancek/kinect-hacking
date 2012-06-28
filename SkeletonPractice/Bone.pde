@@ -6,6 +6,7 @@ class Bone
   int user;
   
   ArrayList points;
+  ArrayList pointColors;
   
   Cylinder cyl;
   
@@ -21,15 +22,34 @@ class Bone
     this.jointBPos = new PVector();
     this.cyl = new Cylinder();
     this.points = new ArrayList();
+    this.pointColors = new ArrayList();
     this.radius = 10;
   }
   
   void draw() {
-    float r = 0;
+    // calculate average radius
+    float radius_ = 0;
     for (int i=0; i<this.points.size(); ++i) {
-      r += (Float) this.points.get(i) / this.points.size();
+      radius_ += (Float) this.points.get(i);
     }
-    this.radius = r;
+    this.radius = radius_ / this.points.size();
+    
+    // calculate average color
+    if (this.pointColors.size() > 0) {
+      colorMode(RGB, 255);
+      int sz = this.pointColors.size();
+      float r=0, g=0, b=0;
+      color c;
+      for (int i=0; i<sz; ++i) {
+        c = (Integer) this.pointColors.get(i);
+        r += red(c);
+        g += green(c);
+        b += blue(c);
+      }
+      fill(color(r/sz, g/sz, b/sz));
+    }
+    
+    noStroke();
     this.cyl.setRadius(this.radius);
     this.cyl.drawBetween(this.jointAPos, this.jointBPos);
   }
@@ -41,6 +61,7 @@ class Bone
     this.ab = PVector.sub(this.jointBPos, this.jointAPos);
     this.length2 = PVector.dot(ab, ab);
     this.points.clear();
+    this.pointColors.clear();
   }
   
   float distanceToPoint(PVector p)
@@ -67,6 +88,12 @@ class Bone
   void addPoint(PVector p, float distance)
   {
     this.points.add(distance);
+  }
+
+  void addPoint(PVector p, float distance, color c)
+  {
+    this.points.add(distance);
+    this.pointColors.add(c);
   }
 }
 

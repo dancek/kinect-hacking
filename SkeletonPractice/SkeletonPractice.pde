@@ -19,6 +19,7 @@ float        rotX = radians(180);  // by default rotate the hole scene 180deg ar
                                    // the data from openni comes upside down
 float        rotY = radians(0);
 boolean      autoCalib=true;
+boolean      drawCloud=true;
 
 PVector      bodyCenter = new PVector();
 PVector      bodyDir = new PVector();
@@ -38,13 +39,15 @@ void setup()
   // disable mirror
   context.setMirror(false);
 
-  // enable depthMap generation 
-  if(context.enableDepth() == false)
+  // enable depthMap and RGB image generation 
+  if(!context.enableDepth() || !context.enableRGB() || !context.alternativeViewPointDepthToImage())
   {
-     println("Can't open the depthMap, maybe the camera is not connected!"); 
+     println("Something went wrong, maybe the camera is not connected!"); 
      exit();
      return;
   }
+  
+  println("Depth image size: " + context.depthWidth() + "x" + context.depthHeight());
 
   // enable skeleton generation for all joints
   context.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
@@ -64,7 +67,6 @@ void setup()
   boneColors = new ArrayList();
   for (int i=0; i < bones.size(); ++i) {
     boneColors.add(color(i, 255, 255));
-    println(boneColors.get(i));
   }
   colorMode(RGB, 255);
 }
@@ -83,9 +85,12 @@ void draw()
   scale(zoomF);
   
   int[]   depthMap = context.depthMap();
-  int     steps   = 3;  // to speed up the drawing, draw every nth point
+  int     steps    = 3;  // to speed up the drawing, draw every nth point
   int     index;
   PVector realWorldPoint;
+
+  PImage  rgbImage = context.rgbImage();
+  rgbImage.loadPixels();
 
   int userCount = context.getNumberOfUsers();
   int[] userMap = null;
@@ -134,7 +139,7 @@ void draw()
               }
             }
             // assign the point to the bone
-            closestBone.addPoint(realWorldPoint, closestDistance);
+            closestBone.addPoint(realWorldPoint, closestDistance, rgbImage.pixels[index]);
             // choose color
             stroke((Integer) boneColors.get(colorIndex));
           } else {
@@ -146,8 +151,10 @@ void draw()
           // default color
           stroke(100); 
 
-        // draw the projected point
-        point(realWorldPoint.x,realWorldPoint.y,realWorldPoint.z);
+        if (drawCloud) {
+          // draw the projected point
+          point(realWorldPoint.x,realWorldPoint.y,realWorldPoint.z);
+        }
       }
     } 
   } 
@@ -157,7 +164,9 @@ void draw()
   for(int i=0;i<userList.length;i++)
   {
     if(context.isTrackingSkeleton(userList[i]))
+    {
       drawSkeleton(userList[i]);
+    }
   }    
  
   // draw the kinect cam
@@ -283,7 +292,8 @@ void keyPressed()
   switch(key)
   {
   case ' ':
-    context.setMirror(!context.mirror());
+    // toggle drawing point cloud
+    drawCloud = !drawCloud;
     break;
   }
     
