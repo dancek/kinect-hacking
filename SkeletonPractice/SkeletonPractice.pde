@@ -14,8 +14,12 @@ import processing.opengl.*;
 import SimpleOpenNI.*;
 import peasy.*;
 
+// save data as PCD every n milliseconds (-1 to disable)
+int          savePcdInterval = 2000;
+
 PeasyCam cam;
 SimpleOpenNI context;
+PcdWriter pcd;
 
 float        zoomF =0.5f;
 float        rotX = radians(180);  // by default rotate the hole scene 180deg around the x-axis, 
@@ -38,6 +42,7 @@ void setup()
 {
   size(1600,1080,OPENGL);  // strange, get drawing error in the cameraFrustum if i use P3D, in opengl there is no problem
   cam = new PeasyCam(this, 0,0,-1000, 1500);
+  pcd = new PcdWriter(savePcdInterval);
   context = new SimpleOpenNI(this);
    
   // disable mirror
@@ -77,6 +82,9 @@ void setup()
 
 void draw()
 {
+  // tell PcdWriter about the new frame
+  pcd.beginFrame(millis());
+  
   // update the cam
   context.update();
 
@@ -125,6 +133,7 @@ void draw()
         // check if there is a user
         if(userMap != null && userMap[index] != 0)
         {
+          color pointColor;
           if (context.isTrackingSkeleton(userMap[index])) {
             // find the closest bone
             int colorIndex = 0;
@@ -143,11 +152,14 @@ void draw()
             // assign the point to the bone
             closestBone.addPoint(realWorldPoint, closestDistance, rgbImage.pixels[index]);
             // choose color
-            stroke((Integer) boneColors.get(colorIndex));
+            pointColor = (Integer) boneColors.get(colorIndex);
           } else {
             int colorIndex = userMap[index] % userColors.length;
-            stroke(userColors[colorIndex]); 
+            pointColor = userColors[colorIndex]; 
           }
+          stroke(pointColor);
+          // tell PcdWriter about this user point
+          pcd.addPoint(realWorldPoint, pointColor);
         }
         else
           stroke(rgbImage.pixels[index]); 
@@ -172,6 +184,8 @@ void draw()
  
   // draw the kinect cam
   context.drawCamFrustum();
+  
+  pcd.endFrame();
 }
 
 // draw the skeleton with the selected joints
