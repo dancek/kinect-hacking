@@ -16,6 +16,7 @@ import peasy.*;
 
 // save data as PCD every n milliseconds (-1 to disable)
 int          savePcdInterval = 2000;
+String       savePcdDirectory = "/home/dance/dev/data";
 
 PeasyCam cam;
 SimpleOpenNI context;
@@ -42,7 +43,7 @@ void setup()
 {
   size(1600,1080,OPENGL);  // strange, get drawing error in the cameraFrustum if i use P3D, in opengl there is no problem
   cam = new PeasyCam(this, 0,0,-1000, 1500);
-  pcd = new PcdWriter(savePcdInterval);
+  pcd = new PcdWriter(savePcdDirectory, savePcdInterval);
   context = new SimpleOpenNI(this);
    
   // disable mirror

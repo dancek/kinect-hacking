@@ -11,10 +11,12 @@ class PcdWriter
   
   ArrayList points;
   
+  String directory;
   FileWriter fw;
   
-  PcdWriter(int intervalMillis)
+  PcdWriter(String directory, int intervalMillis)
   {
+    this.directory = directory;
     this.interval = intervalMillis;
     this.savedFrames = 0;
     this.saveFrame = false;
@@ -61,10 +63,11 @@ class PcdWriter
   
   private void writePcd()
   {
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HHmmss.SSSS");
+    String filename = this.directory + "/" + df.format(new Date()) + ".pcd";
     try {
       // open file
-      // TODO: filename
-      this.fw = new FileWriter("/tmp/cloud.pcd");
+      this.fw = new FileWriter(filename);
       
       // write header
       this.fw.write("VERSION .7\n");
