@@ -9,6 +9,8 @@ class PcdWriter
   
   boolean saveFrame;
   
+  ArrayList points;
+  
   FileWriter fw;
   
   PcdWriter(int intervalMillis)
@@ -16,6 +18,7 @@ class PcdWriter
     this.interval = intervalMillis;
     this.savedFrames = 0;
     this.saveFrame = false;
+    this.points = new ArrayList();
   }
   
   /**
@@ -24,11 +27,6 @@ class PcdWriter
   boolean beginFrame(int elapsedMillis)
   {
     if (this.interval > 0 && elapsedMillis / this.interval > this.savedFrames) {
-      try {
-        this.fw = new FileWriter("cloud.pcd");
-      } catch (IOException e) {
-        return false;
-      }
       this.saveFrame = true;
       return true;
     }
@@ -43,28 +41,73 @@ class PcdWriter
     if (!this.saveFrame) {
       return false;
     }
+    this.writePcd();
+    this.points.clear();
     this.savedFrames += 1;
     this.saveFrame = false;
-    try {
-      this.fw.close();
-    } catch (IOException e) {
-      return false;
-    }
     return true;
   }
   
   /**
    * Add a point to the point cloud.
    */
-  void addPoint(PVector p, color c)
+  void addPoint(PVector p, color c, int type)
   {
     if (!this.saveFrame) {
       return;
     }
+    this.points.add(new PcdPoint(p,c,type));
+  }
+  
+  private void writePcd()
+  {
     try {
-      this.fw.write(p.x + " " + p.y + " " + p.z + " " + c + "\n");
+      // open file
+      // TODO: filename
+      this.fw = new FileWriter("/tmp/cloud.pcd");
+      
+      // write header
+      this.fw.write("VERSION .7\n");
+      this.fw.write("FIELDS x y z rgb type\n");
+      this.fw.write("SIZE 4 4 4 4 4\n");
+      this.fw.write("TYPE F F F I I\n");
+      this.fw.write("COUNT 1 1 1 1 1\n");
+      this.fw.write("WIDTH " + this.points.size() + "\n");
+      this.fw.write("HEIGHT 1\n");
+      this.fw.write("VIEWPOINT 0 0 0 1 0 0 0\n");
+      this.fw.write("POINTS " + this.points.size() + "\n");
+      this.fw.write("DATA ascii\n");
+      
+      // write data
+      PcdPoint p;
+      for (int i = 0; i < this.points.size(); ++i) {
+        p = (PcdPoint) this.points.get(i);
+        this.fw.write(p + "\n");
+      }
+      
+      // close stream
+      this.fw.close();
     } catch (IOException e) {
       // TODO
+    }
+  }
+  
+  private class PcdPoint
+  {
+    PVector p;
+    color c;
+    int t;
+    
+    PcdPoint(PVector p, color c, int t)
+    {
+      this.p = p;
+      this.c = c;
+      this.t = t;
+    }
+    
+    String toString()
+    {
+      return p.x + " " + p.y + " " + p.z + " " + c + " " + t;
     }
   }
 }

@@ -133,7 +133,7 @@ void draw()
         // check if there is a user
         if(userMap != null && userMap[index] != 0)
         {
-          color pointColor;
+          int pointType;
           if (context.isTrackingSkeleton(userMap[index])) {
             // find the closest bone
             int colorIndex = 0;
@@ -152,14 +152,15 @@ void draw()
             // assign the point to the bone
             closestBone.addPoint(realWorldPoint, closestDistance, rgbImage.pixels[index]);
             // choose color
-            pointColor = (Integer) boneColors.get(colorIndex);
+            stroke((Integer) boneColors.get(colorIndex));
+            pointType = colorIndex;
           } else {
             int colorIndex = userMap[index] % userColors.length;
-            pointColor = userColors[colorIndex]; 
+            stroke(userColors[colorIndex]);
+            pointType = -colorIndex;
           }
-          stroke(pointColor);
           // tell PcdWriter about this user point
-          pcd.addPoint(realWorldPoint, pointColor);
+          pcd.addPoint(realWorldPoint, rgbImage.pixels[index], pointType);
         }
         else
           stroke(rgbImage.pixels[index]); 
