@@ -95,14 +95,17 @@ class PcdWriter
   private class PcdPoint
   {
     PVector p;
-    color c;
+    int c;
     int t;
     
     PcdPoint(PVector p, color c, int t)
     {
       this.p = p;
-      this.c = c;
       this.t = t;
+      /* PCD supports color as ARGB uint32_t. Processing also uses 32-bit ARGB
+      but interprets ints as signed. Therefore we need to reinterpret the color
+      as unsigned. Throwing the alpha channel away is the easiest way :) */
+      this.c = c & 0xffffff;
     }
     
     String toString()
