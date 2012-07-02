@@ -15,8 +15,8 @@ import SimpleOpenNI.*;
 import peasy.*;
 
 // save data as PCD every n milliseconds (-1 to disable)
-int          savePcdInterval = 2000;
-String       savePcdDirectory = "/home/dance/dev/data";
+int          savePcdInterval  = -1;
+String       savePcdDirectory = "/home/dance/dev/data/raw";
 
 PeasyCam cam;
 SimpleOpenNI context;
@@ -98,7 +98,7 @@ void draw()
   scale(zoomF);
   
   int[]   depthMap = context.depthMap();
-  int     steps    = 3;  // to speed up the drawing, draw every nth point
+  int     steps    = 2;  // to speed up the drawing, draw every nth point
   int     index;
   PVector realWorldPoint;
 
