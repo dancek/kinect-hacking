@@ -129,20 +129,36 @@ class PcdWriter
     PVector p = new PVector();
     float positionConfidence = context.getJointPositionSkeleton(user, jointType, p);
     
-    PMatrix3D rotation = new PMatrix3D();
-    float rotationConfidence = context.getJointOrientationSkeleton(user, jointType, rotation);
+    String joint = p.x + " " + p.y + " " + p.z + " " + positionConfidence;
+    String orientation = getJointOrientationString(user, jointType);
     
-    // we need a quaternion that corresponds to the rotation matrix
-    PVector before = new PVector(1,0,0);
-    PVector after = new PVector();
-    rotation.mult(before, after); // apply rotation
-
-    // find a suitable quaternion
-    Rot r = new Rot(before, after);
-    // TODO: why do we get zero norm?
+    return joint + " " + orientation;
+  }
+  
+  private String getJointOrientationString(int user, int jointType)
+  {
+    Rot r;
+    float rotationConfidence;
     
-    return p.x + " " + p.y + " " + p.z + " " + positionConfidence + " "
-          + r.getQ0() + " " + r.getQ1() + " " + r.getQ2() + " " + r.getQ3() + " " + rotationConfidence;
+    if (jointType == SimpleOpenNI.SKEL_LEFT_HAND || jointType == SimpleOpenNI.SKEL_RIGHT_HAND ||
+        jointType == SimpleOpenNI.SKEL_LEFT_FOOT || jointType == SimpleOpenNI.SKEL_RIGHT_FOOT) {
+      // these joints have no orientation, so writeout identity rotation with zero confidence
+      r = Rot.IDENTITY;
+      rotationConfidence = 0.0;
+    } else {
+      PMatrix3D rotation = new PMatrix3D();
+      rotationConfidence = context.getJointOrientationSkeleton(user, jointType, rotation);
+      
+      // we need a quaternion that corresponds to the rotation matrix
+      PVector before = new PVector(1,0,0);
+      PVector after = new PVector();
+      rotation.mult(before, after); // apply rotation
+  
+      // find a suitable quaternion
+      r = new Rot(before, after);
+    }
+    
+    return r.getQ0() + " " + r.getQ1() + " " + r.getQ2() + " " + r.getQ3() + " " + rotationConfidence;
   }
 
   private class PcdPoint
