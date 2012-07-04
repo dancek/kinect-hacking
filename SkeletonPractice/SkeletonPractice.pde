@@ -18,6 +18,9 @@ import peasy.*;
 int          savePcdInterval  = -1;
 String       savePcdDirectory = "/home/dance/dev/data/raw";
 
+// read recording from...
+String       recordingName    = null;
+
 PeasyCam cam;
 SimpleOpenNI context;
 PcdWriter pcd;
@@ -45,6 +48,12 @@ void setup()
   cam = new PeasyCam(this, 0,0,-1000, 1500);
   pcd = new PcdWriter(savePcdDirectory, savePcdInterval);
   context = new SimpleOpenNI(this);
+  
+  if (recordingName != null && context.openFileRecording(recordingName) == false)
+  {
+    println("can't find recording !!!!");
+    exit();
+  }
    
   // disable mirror
   context.setMirror(false);
