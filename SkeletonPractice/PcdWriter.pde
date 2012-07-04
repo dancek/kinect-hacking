@@ -126,10 +126,23 @@ class PcdWriter
   
   private String getJointString(int user, int jointType)
   {
-    // TODO: write orientation!
     PVector p = new PVector();
-    float confidence = context.getJointPositionSkeleton(user, jointType, p);
-    return p.x + " " + p.y + " " + p.z + " " + confidence;
+    float positionConfidence = context.getJointPositionSkeleton(user, jointType, p);
+    
+    PMatrix3D rotation = new PMatrix3D();
+    float rotationConfidence = context.getJointOrientationSkeleton(user, jointType, rotation);
+    
+    // we need a quaternion that corresponds to the rotation matrix
+    PVector before = new PVector(1,0,0);
+    PVector after = new PVector();
+    rotation.mult(before, after); // apply rotation
+
+    // find a suitable quaternion
+    Rot r = new Rot(before, after);
+    // TODO: why do we get zero norm?
+    
+    return p.x + " " + p.y + " " + p.z + " " + positionConfidence + " "
+          + r.getQ0() + " " + r.getQ1() + " " + r.getQ2() + " " + r.getQ3() + " " + rotationConfidence;
   }
 
   private class PcdPoint
