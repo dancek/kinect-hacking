@@ -4,6 +4,8 @@
 
 class PcdWriter
 {
+  SimpleOpenNI context;
+  
   int interval;
   int savedFrames;
   
@@ -14,8 +16,9 @@ class PcdWriter
   String directory;
   FileWriter fw;
   
-  PcdWriter(String directory, int intervalMillis)
+  PcdWriter(SimpleOpenNI context, String directory, int intervalMillis)
   {
+    this.context = context;
     this.directory = directory;
     this.interval = intervalMillis;
     this.savedFrames = 0;
@@ -69,6 +72,8 @@ class PcdWriter
       // open file
       this.fw = new FileWriter(filename);
       
+      this.writeSkeletonInfo();
+      
       // write header
       this.fw.write("VERSION .7\n");
       this.fw.write("FIELDS x y z rgb type\n");
@@ -95,6 +100,38 @@ class PcdWriter
     }
   }
   
+  private void writeSkeletonInfo() throws IOException
+  {
+    for (int u = 1; u <= context.getNumberOfUsers(); ++u) {
+      if (context.isTrackingSkeleton(u)) {
+        this.fw.write("# user " + u);
+        this.fw.write("# head "           + this.getJointString(u, SimpleOpenNI.SKEL_HEAD) + "\n");
+        this.fw.write("# neck "           + this.getJointString(u, SimpleOpenNI.SKEL_NECK) + "\n");
+        this.fw.write("# torso "          + this.getJointString(u, SimpleOpenNI.SKEL_TORSO) + "\n");
+        this.fw.write("# left_shoulder "  + this.getJointString(u, SimpleOpenNI.SKEL_LEFT_SHOULDER) + "\n");
+        this.fw.write("# left_elbow "     + this.getJointString(u, SimpleOpenNI.SKEL_LEFT_ELBOW) + "\n");
+        this.fw.write("# left_hand "      + this.getJointString(u, SimpleOpenNI.SKEL_LEFT_HAND) + "\n");
+        this.fw.write("# right_shoulder " + this.getJointString(u, SimpleOpenNI.SKEL_RIGHT_SHOULDER) + "\n");
+        this.fw.write("# right_elbow "    + this.getJointString(u, SimpleOpenNI.SKEL_RIGHT_ELBOW) + "\n");
+        this.fw.write("# right_hand "     + this.getJointString(u, SimpleOpenNI.SKEL_RIGHT_HAND) + "\n");
+        this.fw.write("# left_hip "       + this.getJointString(u, SimpleOpenNI.SKEL_LEFT_HIP) + "\n");
+        this.fw.write("# left_knee "      + this.getJointString(u, SimpleOpenNI.SKEL_LEFT_KNEE) + "\n");
+        this.fw.write("# left_foot "      + this.getJointString(u, SimpleOpenNI.SKEL_LEFT_FOOT) + "\n");
+        this.fw.write("# right_hip "      + this.getJointString(u, SimpleOpenNI.SKEL_RIGHT_HIP) + "\n");
+        this.fw.write("# right_knee "     + this.getJointString(u, SimpleOpenNI.SKEL_RIGHT_KNEE) + "\n");
+        this.fw.write("# right_foot "     + this.getJointString(u, SimpleOpenNI.SKEL_RIGHT_FOOT) + "\n");
+      }
+    }
+  }
+  
+  private String getJointString(int user, int jointType)
+  {
+    // TODO: write orientation!
+    PVector p = null;
+    float confidence = context.getJointPositionSkeleton(user, jointType, p);
+    return p.x + " " + p.y + " " + p.z + " " + confidence;
+  }
+
   private class PcdPoint
   {
     PVector p;
