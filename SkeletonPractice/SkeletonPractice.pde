@@ -46,8 +46,8 @@ void setup()
 {
   size(1600,1080,OPENGL);  // strange, get drawing error in the cameraFrustum if i use P3D, in opengl there is no problem
   cam = new PeasyCam(this, 0,0,-1000, 1500);
-  pcd = new PcdWriter(context, savePcdDirectory, savePcdInterval);
   context = new SimpleOpenNI(this);
+  pcd = new PcdWriter(context, savePcdDirectory, savePcdInterval);
   
   if (recordingName != null && context.openFileRecording(recordingName) == false)
   {

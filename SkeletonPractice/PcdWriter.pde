@@ -104,7 +104,7 @@ class PcdWriter
   {
     for (int u = 1; u <= context.getNumberOfUsers(); ++u) {
       if (context.isTrackingSkeleton(u)) {
-        this.fw.write("# user " + u);
+        this.fw.write("# user " + u + "\n");
         this.fw.write("# head "           + this.getJointString(u, SimpleOpenNI.SKEL_HEAD) + "\n");
         this.fw.write("# neck "           + this.getJointString(u, SimpleOpenNI.SKEL_NECK) + "\n");
         this.fw.write("# torso "          + this.getJointString(u, SimpleOpenNI.SKEL_TORSO) + "\n");
@@ -127,7 +127,7 @@ class PcdWriter
   private String getJointString(int user, int jointType)
   {
     // TODO: write orientation!
-    PVector p = null;
+    PVector p = new PVector();
     float confidence = context.getJointPositionSkeleton(user, jointType, p);
     return p.x + " " + p.y + " " + p.z + " " + confidence;
   }
