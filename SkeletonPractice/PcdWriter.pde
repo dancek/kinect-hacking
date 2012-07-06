@@ -7,7 +7,7 @@ class PcdWriter
   SimpleOpenNI context;
   
   int interval;
-  int savedFrames;
+  int lastMillis;
   
   boolean saveFrame;
   
@@ -21,7 +21,7 @@ class PcdWriter
     this.context = context;
     this.directory = directory;
     this.interval = intervalMillis;
-    this.savedFrames = 0;
+    this.lastMillis = 0;
     this.saveFrame = false;
     this.points = new ArrayList();
   }
@@ -29,10 +29,11 @@ class PcdWriter
   /**
    * Start a new frame. Check if the interval has passed and the frame should be saved.
    */
-  boolean beginFrame(int elapsedMillis)
+  boolean beginFrame(int elapsedMillis, boolean keepFrame)
   {
-    if (this.interval > 0 && elapsedMillis / this.interval > this.savedFrames) {
+    if (keepFrame && this.interval > 0 && elapsedMillis > this.interval + this.lastMillis) {
       this.saveFrame = true;
+      this.lastMillis = elapsedMillis;
       return true;
     }
     return false;
@@ -48,7 +49,6 @@ class PcdWriter
     }
     this.writePcd();
     this.points.clear();
-    this.savedFrames += 1;
     this.saveFrame = false;
     return true;
   }

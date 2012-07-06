@@ -92,9 +92,6 @@ void setup()
 
 void draw()
 {
-  // tell PcdWriter about the new frame
-  pcd.beginFrame(millis());
-  
   // update the cam
   context.update();
 
@@ -109,6 +106,7 @@ void draw()
   int[]   depthMap = context.depthMap();
   int     steps    = 2;  // to speed up the drawing, draw every nth point
   int     index;
+  boolean trackingSkeleton = false;
   PVector realWorldPoint;
 
   PImage  rgbImage = context.rgbImage();
@@ -121,6 +119,7 @@ void draw()
     userMap = context.getUsersPixels(SimpleOpenNI.USERS_ALL);
     for (int u=1; u<=userCount; ++u) {
       if (context.isTrackingSkeleton(u)) {
+        trackingSkeleton = true;
         Bone bone;
         for (int i=0; i < bones.size(); ++i) {
           bone = (Bone) bones.get(i);
@@ -129,7 +128,10 @@ void draw()
       }
     }
   }
- 
+  
+  // tell PcdWriter about a new frame
+  pcd.beginFrame(millis(), trackingSkeleton);
+
   stroke(100); 
   for(int y=0;y < context.depthHeight();y+=steps)
   {
