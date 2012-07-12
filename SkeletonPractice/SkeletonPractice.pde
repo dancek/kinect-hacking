@@ -31,6 +31,7 @@ float        rotX = radians(180);  // by default rotate the hole scene 180deg ar
 float        rotY = radians(0);
 boolean      autoCalib=true;
 boolean      drawCloud=true;
+boolean      drawSkeleton=true;
 
 PVector      bodyCenter = new PVector();
 PVector      bodyDir = new PVector();
@@ -185,15 +186,17 @@ void draw()
     } 
   } 
   
-  // draw the skeleton if it's available
-  int[] userList = context.getUsers();
-  for(int i=0;i<userList.length;i++)
-  {
-    if(context.isTrackingSkeleton(userList[i]))
+  if (drawSkeleton) {
+    // draw the skeleton if it's available
+    int[] userList = context.getUsers();
+    for(int i=0;i<userList.length;i++)
     {
-      drawSkeleton(userList[i]);
+      if(context.isTrackingSkeleton(userList[i]))
+      {
+        drawSkeleton(userList[i]);
+      }
     }
-  }    
+  }
  
   // draw the kinect cam
   context.drawCamFrustum();
@@ -322,6 +325,9 @@ void keyPressed()
   case ' ':
     // toggle drawing point cloud
     drawCloud = !drawCloud;
+    break;
+  case 's':
+    drawSkeleton = !drawSkeleton;
     break;
   }
     
