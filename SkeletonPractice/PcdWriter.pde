@@ -19,11 +19,21 @@ class PcdWriter
   PcdWriter(SimpleOpenNI context, String directory, int intervalMillis)
   {
     this.context = context;
-    this.directory = directory;
     this.interval = intervalMillis;
     this.lastMillis = 0;
     this.saveFrame = false;
     this.points = new ArrayList();
+
+    if (intervalMillis > 0) {
+      // make a directory for this recording specifically
+      DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
+      this.directory = directory + "/" + df.format(new Date());
+      boolean success = (new File(this.directory)).mkdirs();
+      if (!success) {
+        println("directory creation failed!");
+        exit();
+      }
+    }
   }
   
   /**
