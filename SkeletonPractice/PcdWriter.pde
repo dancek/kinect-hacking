@@ -86,7 +86,7 @@ class PcdWriter
       
       // write header
       this.fw.write("VERSION .7\n");
-      this.fw.write("FIELDS x y z rgb type\n");
+      this.fw.write("FIELDS x y z rgba type\n");
       this.fw.write("SIZE 4 4 4 4 4\n");
       this.fw.write("TYPE F F F I I\n");
       this.fw.write("COUNT 1 1 1 1 1\n");
@@ -179,7 +179,8 @@ class PcdWriter
     
     PcdPoint(PVector p, color c, int t)
     {
-      this.p = p;
+      // convert coordinates from mm (?) to m (PCL tools like it that way)
+      this.p = PVector.div(p, 1000.0);
       this.t = t;
       /* PCD supports color as ARGB uint32_t. Processing also uses 32-bit ARGB
       but interprets ints as signed. Therefore we need to reinterpret the color
