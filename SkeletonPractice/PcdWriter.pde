@@ -10,18 +10,20 @@ class PcdWriter
   int lastMillis;
   
   boolean saveFrame;
+  boolean fullFrame;
   
   ArrayList points;
   
   String directory;
   FileWriter fw;
   
-  PcdWriter(SimpleOpenNI context, String directory, int intervalMillis)
+  PcdWriter(SimpleOpenNI context, String directory, int intervalMillis, boolean fullFrame)
   {
     this.context = context;
     this.interval = intervalMillis;
     this.lastMillis = 0;
     this.saveFrame = false;
+    this.fullFrame = fullFrame;
     this.points = new ArrayList();
 
     if (intervalMillis > 0) {
@@ -90,8 +92,14 @@ class PcdWriter
       this.fw.write("SIZE 4 4 4 4 4\n");
       this.fw.write("TYPE F F F I I\n");
       this.fw.write("COUNT 1 1 1 1 1\n");
-      this.fw.write("WIDTH " + this.points.size() + "\n");
-      this.fw.write("HEIGHT 1\n");
+      if (fullFrame) {
+        // TODO: support other sizes
+        this.fw.write("WIDTH 640\n");
+        this.fw.write("HEIGHT 480\n");
+      } else {
+        this.fw.write("WIDTH " + this.points.size() + "\n");
+        this.fw.write("HEIGHT 1\n");
+      }
       this.fw.write("VIEWPOINT 0 0 0 1 0 0 0\n");
       this.fw.write("POINTS " + this.points.size() + "\n");
       this.fw.write("DATA ascii\n");

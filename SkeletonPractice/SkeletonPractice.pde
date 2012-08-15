@@ -16,7 +16,8 @@ import peasy.*;
 
 // save data as PCD every n milliseconds (-1 to disable)
 int          savePcdInterval  = -1;
-String       savePcdDirectory = "/home/dance/dev/data/raw";
+//String       savePcdDirectory = "/home/dance/dev/data/pcf";
+String       savePcdDirectory = "/mnt/ramdisk";
 
 // read recording from...
 String       recordingName    = null;
@@ -24,6 +25,8 @@ String       recordingName    = null;
 PeasyCam cam;
 SimpleOpenNI context;
 PcdWriter pcd;
+
+boolean      pcdFullFrame = true;  // save all points in .pcd (as opposed to only people)
 
 float        zoomF =0.5f;
 float        rotX = radians(180);  // by default rotate the hole scene 180deg around the x-axis, 
@@ -48,7 +51,7 @@ void setup()
   size(1600,1080,OPENGL);  // strange, get drawing error in the cameraFrustum if i use P3D, in opengl there is no problem
   cam = new PeasyCam(this, 0,0,-1000, 1500);
   context = new SimpleOpenNI(this);
-  pcd = new PcdWriter(context, savePcdDirectory, savePcdInterval);
+  pcd = new PcdWriter(context, savePcdDirectory, savePcdInterval, pcdFullFrame);
   
   if (recordingName != null && context.openFileRecording(recordingName) == false)
   {
@@ -105,7 +108,7 @@ void draw()
   scale(zoomF);
   
   int[]   depthMap = context.depthMap();
-  int     steps    = 2;  // to speed up the drawing, draw every nth point
+  int     steps    = 1;  // to speed up the drawing, draw every nth point
   int     index;
   boolean trackingSkeleton = false;
   PVector realWorldPoint;
@@ -174,14 +177,19 @@ void draw()
           }
           // tell PcdWriter about this user point
           pcd.addPoint(realWorldPoint, rgbImage.pixels[index], pointType);
-        }
-        else
+        } else {
           stroke(rgbImage.pixels[index]); 
+          if (pcdFullFrame)
+            pcd.addPoint(realWorldPoint, rgbImage.pixels[index], -127);
+        }
 
         if (drawCloud) {
           // draw the projected point
           point(realWorldPoint.x,realWorldPoint.y,realWorldPoint.z);
         }
+      } else {
+        if (pcdFullFrame)
+          pcd.addPoint(new PVector(0,0,0), 0, -127);
       }
     } 
   } 
