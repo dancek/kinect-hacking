@@ -27,11 +27,14 @@ String targetpath = mhpath + "/data/targets/measure/measure-neckheight-increase.
 String basemeshpath = mhpath + "/data/3dobjs/base.obj";
 
 ControlP5 cp5;
+ControlWindow controlWindow;
 OBJModel human;
 PeasyCam cam;
 
+ArrayList targets;
 Target target;
 float sliderValue;
+TargetSlider ts;
 
 void setup()
 {
@@ -43,21 +46,15 @@ void setup()
 
   human.disableMaterial();
 
-  // add a horizontal sliders, the value of this slider will be linked
-  // to variable 'sliderValue' 
-  cp5.addSlider("sliderValue")
-     .setPosition(10,10)
-     .setRange(-1.0, 1.0)
-     ;
-  cp5.setAutoDraw(false);
-  
-  target = new Target(targetpath);
+  controlWindow = cp5.addControlWindow("controlP5window", 30, 30, 320, 400)
+    .hideCoordinates().setBackground(color(40));
+
+  ts = new TargetSlider(cp5, controlWindow, 0, targetpath, human);
 }
 
 void draw()
 {
-  target.setWeight(sliderValue);
-  target.apply(human);
+  ts.update();
   
   background(0);
   lights();
@@ -68,13 +65,5 @@ void draw()
   scale(20);
   human.draw();
   popMatrix();
-  
-  gui();
-}
-
-void gui() {
-  cam.beginHUD();
-  cp5.draw();
-  cam.endHUD();
 }
 
