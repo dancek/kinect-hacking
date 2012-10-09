@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.io.File;
 import processing.opengl.*;
 import controlP5.*;
 import peasy.*;
@@ -23,7 +24,7 @@ import saito.objloader.*;
 
 // configuration
 String mhpath = "/home/dance/dev/makehuman";
-String targetpath = mhpath + "/data/targets/measure/measure-neckheight-increase.target";
+String targetpath = mhpath + "/data/targets/measure/";
 String basemeshpath = mhpath + "/data/3dobjs/base.obj";
 
 ControlP5 cp5;
@@ -40,21 +41,30 @@ void setup()
 {
   size(1024,768,OPENGL);
   
+  targets = new ArrayList();
   cp5 = new ControlP5(this);
   cam = new PeasyCam(this, 500);
   human = new OBJModel(this, basemeshpath, QUAD);
 
   human.disableMaterial();
 
-  controlWindow = cp5.addControlWindow("controlP5window", 30, 30, 320, 400)
+  controlWindow = cp5.addControlWindow("controlP5window", 30, 30, 320, 600)
     .hideCoordinates().setBackground(color(40));
 
-  ts = new TargetSlider(cp5, controlWindow, 0, targetpath, human);
+  int i = 0;
+  File dir = new File(targetpath);
+  for (File f : dir.listFiles())
+  {
+    ts = new TargetSlider(cp5, controlWindow, i++, f.getAbsolutePath(), human);
+    targets.add(ts);
+  }
 }
 
 void draw()
 {
-  ts.update();
+  for (Object t : targets) {
+    ((TargetSlider) t).update();
+  }
   
   background(0);
   lights();
