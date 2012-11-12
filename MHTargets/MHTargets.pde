@@ -25,7 +25,7 @@ import saito.objloader.*;
 // configuration
 String mhpath = "/home/dance/dev/makehuman";
 String targetpath = mhpath + "/data/targets/measure/";
-String basemeshpath = mhpath + "/data/3dobjs/base.obj";
+String basemeshpath = "/home/dance/makehuman/data/clean_base.obj";
 
 ControlP5 cp5;
 ControlWindow controlWindow;
@@ -70,6 +70,8 @@ void draw()
   lights();
   noStroke();
   fill(127);
+
+  specular(1,1,1);
 
   pushMatrix();
   scale(20);
