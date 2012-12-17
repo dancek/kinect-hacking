@@ -13,8 +13,16 @@ class Bone
   PVector ab;    // vector between endpoints
   float length2; // length of ab, squared
   
+  String name;   // name of bone
+  
   Bone(int user, int a, int b)
   {
+    this(user, "", a, b);
+  }
+  
+  Bone(int user, String name, int a, int b)
+  {
+    this.name = name;
     this.user = user;
     this.jointAType = a;
     this.jointBType = b;
